@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define WindowsApp2_TargetDir=$(var.WindowsApp2.TargetDir)?>
+	<Product Id="0436C2D9-7373-4E8F-A91F-6AAF34514CDE" Name="WindowsApp2" Language="1033" Version="1.0.0.0" Manufacturer="QS" UpgradeCode="d72052f5-fafd-449f-b70c-59074c52fecf">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    
+    <UI Id="WixUI_InstallDir">
+        <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+        <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+        <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+        <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+        <Property Id="WixUI_Mode" Value="InstallDir" />
+
+        <Dialog Id="SpecialDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
+          <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+          <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+          <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+            <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+          </Control>
+
+          <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.InstallDirDlgDescription)" />
+          <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.InstallDirDlgTitle)" />
+          <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+          <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+          <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+          <Control Id="FolderLabel" Type="Text" X="20" Y="60" Width="290" Height="30" NoPrefix="yes" Text="!(loc.InstallDirDlgFolderLabel)" />
+          <Control Id="Folder" Type="PathEdit" X="20" Y="100" Width="320" Height="18" Property="WIXUI_SPECDIR" Indirect="yes" />
+          <Control Id="ChangeFolder" Type="PushButton" X="20" Y="120" Width="56" Height="17" Text="!(loc.InstallDirDlgChange)" />
+        </Dialog>
+
+
+        <DialogRef Id="BrowseDlg" />
+        <DialogRef Id="DiskCostDlg" />
+        <DialogRef Id="ErrorDlg" />
+        <DialogRef Id="FatalError" />
+        <DialogRef Id="FilesInUse" />
+        <DialogRef Id="MsiRMFilesInUse" />
+        <DialogRef Id="PrepareDlg" />
+        <DialogRef Id="ProgressDlg" />
+        <DialogRef Id="ResumeDlg" />
+        <DialogRef Id="UserExit" />
+
+        <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+        <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+        <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+        <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SpecialDlg">NOT Installed</Publish>
+        <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SpecialDlg">Installed AND PATCH</Publish>
+
+        <Publish Dialog="SpecialDlg" Control="Back" Event="WelcomeDlg" Value="LicenseAgreementDlg">1</Publish>
+        <Publish Dialog="SpecialDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SPECDIR]" Order="1">1</Publish>
+        <Publish Dialog="SpecialDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+        <Publish Dialog="SpecialDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+        <Publish Dialog="SpecialDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+        <Publish Dialog="SpecialDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_SPECDIR]" Order="1">1</Publish>
+        <Publish Dialog="SpecialDlg" Control="ChangeFolder" Event="SpawnDialog" Value="LicenseAgreementDlg" Order="2">1</Publish>
+
+        <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="SpecialDlg" Value="WelcomeDlg">1</Publish>
+        <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
+
+        <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+        <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish>
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">Installed AND PATCH</Publish>
+
+        <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+        <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+        <Property Id="ARPNOMODIFY" Value="1" />
+      </UI>
+
+      <UIRef Id="WixUI_Common" />
+    
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="WIXUI_SPECDIR" Value="SPECFOLDER" />
+    
+    <MediaTemplate EmbedCab="yes" />
+    
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+		<Feature Id="ProductFeature" Title="WindowsApp2" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />   
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="WindowsApp2" />
+			</Directory>
+      <Directory Id="ProgramMenuFolder">
+       <Directory Id="ApplicationProgramsFolder" Name="WindowsApp2" />
+      </Directory>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="SPECFOLDER" Name="SpecialDirectory" />
+		</Directory>
+	</Fragment>
+
+
+  
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="49715CD9-D6B7-4D61-9EA5-A8F1B86E788F">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="WindowsApp2" Description="WindowsApp2" Target="[INSTALLFOLDER]WindowsApp2.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\MyWpfApplication" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktop" Guid="1FC6FA14-8AF7-4E47-8A3B-0B9EE7119323">
+        <Shortcut Id="ApplicationDesktopShortcut" Name="WindowsApp2" Description="WindowsApp2" Target="[INSTALLFOLDER]WindowsApp2.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\WindowsApp2" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="WindowsApp2.exe" Guid="a071ce68-7035-43c4-be85-b10d7adb44af">
+			  <File Id="WindowsApp2.exe" Name="WindowsApp2.exe" Source="$(var.WindowsApp2_TargetDir)WindowsApp2.exe" />
+			</Component>
+			<Component Id="WindowsApp2.exe.config" Guid="b0196056-2aaf-4e85-beb5-5b01eb18070d">
+			  <File Id="WindowsApp2.exe.config" Name="WindowsApp2.exe.config" Source="$(var.WindowsApp2_TargetDir)WindowsApp2.exe.config" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
