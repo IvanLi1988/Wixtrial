@@ -1,0 +1,11 @@
+Create custom text entry box:
+<Control Id="TestInput" Type="Edit" X="25" Y="200" Width="280" Height="15" Property="Test_input" />
+
+Create Registery Entry
+
+      <Component Id="RegistryEntries" Guid="F0B8893E-C8FD-41AA-BD3A-784353D6B30D">
+        <RegistryKey Root="HKCU"
+                     Key="Software\QS\MyApp2"
+              Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="Folder" Type="string" Value="[SPECFOLDER]"/>
+        </RegistryKey>
